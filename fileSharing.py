@@ -2,6 +2,7 @@ import socket
 import tkinter
 from tkinter import filedialog, messagebox
 import os
+import base64
 
 if os.access("theme_config.txt", os.F_OK):
     with open("theme_config.txt") as read_config:
@@ -39,7 +40,7 @@ def _sendFiles(self, sender_ip, file_path, dest_port):
         with open(filename, "rb+") as f:
             while True:
                 # read the bytes from the file
-                bytes_read = f.read(BUFFER_SIZE)
+                bytes_read =  f.read(BUFFER_SIZE)
                 if not bytes_read:
                     # file transmitting is done
                     break
@@ -78,6 +79,7 @@ def _receiveFiles(self, receiver_ip, port=5001):
                 # file transmitting is done
                 break
             # write to the file the bytes we just received
+            bytes_read = base64.b64decode(bytes(bytes_read))
             f.write(bytes_read)
     # close the client socket
     client_socket.close()
