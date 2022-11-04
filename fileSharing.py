@@ -2,7 +2,7 @@ import socket
 import tkinter
 from tkinter import filedialog, messagebox
 import os
-import base64
+from cryptography.fernet import Fernet
 
 if os.access("theme_config.txt", os.F_OK):
     with open("theme_config.txt") as read_config:
@@ -36,7 +36,6 @@ def _sendFiles(sender_ip, file_path, dest_port):
         s.connect((host, port))
         print("[+] Connected.")
         s.send(f"{filename}{SEPARATOR}{filesize}".encode())
-        messagebox.showinfo("Success", f"Connected and sent to {sender_ip}")
         with open(filename, "rb+") as f:
             while True:
                 # read the bytes from the file
@@ -45,11 +44,16 @@ def _sendFiles(sender_ip, file_path, dest_port):
                     # file transmitting is done
                     break
                 # we use sendall to assure transimission in busy networks
-                s.sendall(bytes_read)
+                key = Fernet.generate_key()
+                encryption = Fernet(key)
+                file_to_send = encryption.encrypt(bytes_read)
+                s.sendall(file_to_send)
+        messagebox.showinfo("Success", f"Connected and sent to {sender_ip}")
+
         # close the socket
         s.close()
 
-def _receiveFiles(receiver_ip, port=5001):
+def _receiveFiles(key, receiver_ip, port=5001):
     """ receive files in the same network (thepythoncode.com's code)"""
     SERVER_HOST = receiver_ip
     SERVER_PORT = port
@@ -79,8 +83,9 @@ def _receiveFiles(receiver_ip, port=5001):
                 # file transmitting is done
                 break
             # write to the file the bytes we just received
-            bytes_read = base64.b64decode(bytes(bytes_read))
-            f.write(bytes_read)
+            decryptor = Fernet(key=key)
+            file_to_receive = decryptor.decrypt(bytes_read).decode(encoding='utf-8')
+            f.write(file_to_receive)
     # close the client socket
     client_socket.close()
     # close the server socket
@@ -141,7 +146,7 @@ def recieveFiles():
     code)"""
     def submit_form():
         """ submits the form to _sendFiles()"""
-        _receiveFiles(ip_address.get(), port=int(port.get()))
+        _receiveFiles(int(decryption_key), ip_address.get(), port=int(port.get()))
     recieve_files = tkinter.Tk()
     recieve_files.configure(background=THEME_WINDOW_BG,)
     recieve_files.title("File transfer form")
@@ -159,12 +164,17 @@ def recieveFiles():
     b.grid(row=1, column=0)
     port = tkinter.Entry(recieve_files)
     port.grid(row=1, column=1)
+    c = tkinter.Label(recieve_files, text="Decryption Key-> ",
+    background=THEME_WINDOW_BG, foreground=THEME_FOREGROUND)
+    c.grid(row=2, column=0)
+    decryption_key = tkinter.Entry(recieve_files)
+    decryption_key.grid(row=2, column=1)
     submit = tkinter.Button(recieve_files,
                             text="Submit the form",
                             background=THEME_WINDOW_BG,
                             foreground=THEME_FOREGROUND,
                             command=submit_form)
-    submit.grid(row=2, column=0)
+    submit.grid(row=3, column=0)
     recieve_files.mainloop()
 a = tkinter.Label(master=control_window,
                     text="Transfer Files",
