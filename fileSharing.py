@@ -18,7 +18,7 @@ else:
 control_window = tkinter.Tk()
 control_window.configure(background=THEME_WINDOW_BG)
 
-def _sendFiles(self, sender_ip, file_path, dest_port):
+def _sendFiles(sender_ip, file_path, dest_port):
         """ send files over the same network
         thepythoncode.com's CODE"""
         #ALERT: thepythoncode.com's CODE! MAY CONTAIN FLAWS WITH THIS CODE
@@ -49,7 +49,7 @@ def _sendFiles(self, sender_ip, file_path, dest_port):
         # close the socket
         s.close()
 
-def _receiveFiles(self, receiver_ip, port=5001):
+def _receiveFiles(receiver_ip, port=5001):
     """ receive files in the same network (thepythoncode.com's code)"""
     SERVER_HOST = receiver_ip
     SERVER_PORT = port
