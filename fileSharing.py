@@ -44,8 +44,6 @@ def _sendFiles(sender_ip, file_path, dest_port):
                     # file transmitting is done
                     break
                 # we use sendall to assure transimission in busy networks
-                key = Fernet.generate_key()
-                encryption = Fernet(key)
                 file_to_send = encryption.encrypt(bytes_read)
                 s.sendall(file_to_send)
         messagebox.showinfo("Success", f"Connected and sent to {sender_ip}")
@@ -92,8 +90,13 @@ def _receiveFiles(key, receiver_ip, port=5001):
     s.close()
 
 def send_file():
+
     """ send files GUI, if done neatly, will call the _sendFiles()
     method"""
+    global encryption
+    key = Fernet.generate_key()
+    messagebox.showinfo("Key", f"Key is {key}")
+    encryption = Fernet(key)
     def submit_form():
         """ submits the form to _sendFiles()"""
         _sendFiles(ip_address.get(), fileSelect, int(sendThruPort.get()))
