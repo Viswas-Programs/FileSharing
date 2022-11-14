@@ -146,7 +146,7 @@ def recieveFiles():
     code)"""
     def submit_form():
         """ submits the form to _sendFiles()"""
-        _receiveFiles(int(decryption_key), ip_address.get(), port=int(port.get()))
+        _receiveFiles(bytes(str(decryption_key), encoding='utf-8'), ip_address.get(), port=int(port.get()))
     recieve_files = tkinter.Tk()
     recieve_files.configure(background=THEME_WINDOW_BG,)
     recieve_files.title("File transfer form")
