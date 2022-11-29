@@ -94,7 +94,7 @@ def send_file():
     """ send files GUI, if done neatly, will call the _sendFiles()
     method"""
     global encryption
-    key = Fernet.generate_key()
+    key = b'KEYKEYKEY123456123456'
     messagebox.showinfo("Key", f"Key is {key}")
     encryption = Fernet(key)
     def submit_form():
